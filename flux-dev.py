@@ -19,6 +19,7 @@ pipe.enable_model_cpu_offload()
 # pipe.load_lora_weights("XLabs-AI/flux-furry-lora", weight_name="furry_lora.safetensors", adapter_name="fury_lora")
 pipe.load_lora_weights('linoyts/yarn_art_flux_1_700_custom', weight_name='pytorch_lora_weights.safetensors', adapter_name="yarn_art")
 pipe.load_lora_weights('alvdansen/flux_film_foto', weight_name='araminta_k_flux_film_foto.safetensors', adapter_name="film_foto")
+pipe.load_lora_weights('alvdansen/softserve_anime', weight_name='flux_dev_softstyle_araminta_k.safetensors', adapter_name="softserve_anime")
 
 def generate(positive_prompt, height, width, guidance, steps, seed, lora_select=None, lora_weight=0.0):
   if seed == 0:
@@ -48,7 +49,7 @@ with gr.Blocks(analytics_enabled=False) as demo:
             seed = gr.Slider(minimum=0, maximum=18446744073709551615, value=0, step=1, label="seed (0=random)")
             guidance = gr.Slider(minimum=0, maximum=20, value=3.5, step=0.5, label="guidance")
             steps = gr.Slider(minimum=4, maximum=50, value=4, step=1, label="steps")
-            lora_select = gr.Dropdown(["film_foto", "yarn_art"])
+            lora_select = gr.Dropdown(["film_foto", "yarn_art", "softserve_anime"])
             lora_strength_model = gr.Slider(minimum=0, maximum=1, value=1.0, step=0.1, label="lora_strength_model")
             generate_button = gr.Button("Generate")
         with gr.Column():
