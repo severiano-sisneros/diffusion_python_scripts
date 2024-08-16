@@ -2,20 +2,32 @@ import torch
 from diffusers import FluxPipeline 
 import gradio as gr
 
+# Load FLUX.1-dev pipeline and enable CUDA
 pipe = FluxPipeline.from_pretrained("black-forest-labs/FLUX.1-dev", torch_dtype=torch.bfloat16).to("cuda")
+
+# Enable offloading CPU to help with GPU memory management
 pipe.enable_model_cpu_offload()
 
+# Load LoRAs
 pipe.load_lora_weights('linoyts/yarn_art_flux_1_700_custom', weight_name='pytorch_lora_weights.safetensors', adapter_name="yarn_art")
 pipe.load_lora_weights('alvdansen/flux_film_foto', weight_name='araminta_k_flux_film_foto.safetensors', adapter_name="film_foto")
 pipe.load_lora_weights('alvdansen/softserve_anime', weight_name='flux_dev_softstyle_araminta_k.safetensors', adapter_name="softserve_anime")
 
+# Function called whenever the "generate" button is clicked 
 def generate(positive_prompt, height, width, guidance, steps, seed, lora_select=None, lora_weight=0.0):
+
+  # If seed is set to 0, generate a random seed using the CPU
   if seed == 0:
     seed = torch.Generator("cpu").seed()
+
+  # Print the seed for debug
   print(seed)
 
+  # Select the appropriate lora, if one has been selected
   if lora_select is not None:
     pipe.set_adapters(lora_select)
+
+  # Generate the image
   image = pipe(
       positive_prompt,
       height=height,
@@ -25,9 +37,12 @@ def generate(positive_prompt, height, width, guidance, steps, seed, lora_select=
       generator=torch.Generator("cpu").manual_seed(seed),
       joint_attention_kwargs={"scale": lora_weight},
   ).images[0]
+
+  # Save locally and return the image
   image.save("./flux-schnell.png")
   return "./flux-schnell.png"
 
+# Configure Gradio GUI
 with gr.Blocks(analytics_enabled=False) as demo:
     with gr.Row():
         with gr.Column():
@@ -45,4 +60,5 @@ with gr.Blocks(analytics_enabled=False) as demo:
 
     generate_button.click(fn=generate, inputs=[positive_prompt, height, width, guidance, steps, seed, lora_select, lora_strength_model], outputs=output_image)
 
+# Launch app
 demo.queue().launch(inline=False, share=True, debug=True)
