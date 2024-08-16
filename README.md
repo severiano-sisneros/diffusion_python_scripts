@@ -21,4 +21,5 @@ pip install peft
 To run you need a HuggingFace authentication token. 
 
 `HF_TOKEN=<YOUR_TOKEN> python3 flux-dev.py`
+
 This starts a Gradio server you can use to play with the model and various LoRAs.
