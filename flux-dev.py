@@ -2,21 +2,9 @@ import torch
 from diffusers import FluxPipeline 
 import gradio as gr
 
-class LoraSelect:
-  def __init__(self, lora_name, lora_repo_id):
-    self.lora_name = lora_name
-    self.lora_repo_id = lora_repo_id
-
-lora_dict = {
-        "realism_lora": LoraSelect("realism_lora.safetensors", "XLabs-AI/flux-lora-collection"),
-        "fury_lora": LoraSelect("furry_lora.safetensors", "XLabs-AI/flux-furry-lora")
-        }
-
 pipe = FluxPipeline.from_pretrained("black-forest-labs/FLUX.1-dev", torch_dtype=torch.bfloat16).to("cuda")
 pipe.enable_model_cpu_offload()
 
-# pipe.load_lora_weights("XLabs-AI/flux-lora-collection", weight_name= "realism_lora.safetensors", adapter_name="realism_lora")
-# pipe.load_lora_weights("XLabs-AI/flux-furry-lora", weight_name="furry_lora.safetensors", adapter_name="fury_lora")
 pipe.load_lora_weights('linoyts/yarn_art_flux_1_700_custom', weight_name='pytorch_lora_weights.safetensors', adapter_name="yarn_art")
 pipe.load_lora_weights('alvdansen/flux_film_foto', weight_name='araminta_k_flux_film_foto.safetensors', adapter_name="film_foto")
 pipe.load_lora_weights('alvdansen/softserve_anime', weight_name='flux_dev_softstyle_araminta_k.safetensors', adapter_name="softserve_anime")
